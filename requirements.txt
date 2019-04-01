@@ -1,0 +1,17 @@
+aenum==2.1.2
+aiosqlite==0.9.0
+asn1crypto==0.24.0
+cffi==1.12.2
+ciso8601==2.1.1
+cryptography==2.6.1
+dnspython==1.16.0
+email-validator==1.0.3
+idna==2.8
+phonenumbers==8.10.8
+pycparser==2.19
+pydantic==0.21
+PyJWT==1.7.1
+PyPika==0.26.0
+six==1.12.0
+tornado==6.0.2
+tortoise-orm==0.11.7
