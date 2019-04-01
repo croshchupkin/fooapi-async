@@ -32,10 +32,10 @@ async def get_user_list(
 
 
 async def get_single_user(user_id: int) -> User:
-    return await _fetch_single_user(user_id)
+    return await _fetch_single_user(user_id, prefetch_contacts=True)
 
 
-async def update_user(user_id: int, data: Dict[str, Any]) -> None:
+async def update_user(user_id: int, **data) -> None:
     user = await _fetch_single_user(user_id)
     for name, val in data.items():
         setattr(user, name, val)

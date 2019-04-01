@@ -34,12 +34,21 @@ def unathorized_on_authorization_error(method):
     return http_code_on_exception(401, AuthorizationError)(method)
 
 
+def ensure_user_contacts_can_be_edited(method):
+    @wraps(method)
+    async def wrapper(self, user_id, *args, **kwargs):
+        headers = Headers.parse_obj(dict(self.request.headers.items()))
+        await ensure_can_edit_user(int(user_id), headers.creator_id)
+        await method(self, user_id, *args, **kwargs)
+    return wrapper
+
+
 def ensure_user_can_be_edited(method):
     @wraps(method)
     async def wrapper(self, user_id, *args, **kwargs):
         headers = Headers.parse_obj(dict(self.request.headers.items()))
-        await ensure_can_edit_user(int(user_id))
-        await method(self, user_id, headers.creator_id, *args, **kwargs)
+        await ensure_can_edit_user(int(user_id), headers.creator_id)
+        await method(self, user_id, *args, **kwargs)
     return wrapper
 
 
@@ -47,7 +56,7 @@ def ensure_contact_can_be_edited(method):
     @wraps(method)
     async def wrapper(self, contact_id, *args, **kwargs):
         headers = Headers.parse_obj(dict(self.request.headers.items()))
-        await ensure_can_edit_user(int(contact_id), headers.creator_id)
+        await ensure_can_edit_contact(int(contact_id), headers.creator_id)
         await method(self, contact_id, *args, **kwargs)
     return wrapper
 

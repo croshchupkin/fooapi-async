@@ -80,8 +80,7 @@ class User(Model):
             'id': self.id,
             'name': self.name,
             'created_at': self.created_at.isoformat(),
+            'contacts': [c.as_dict() for c in self.contacts]
         }
-        if dump_contacts:
-            res['contacts'] = [c.as_dict() for c in self.contacts]
 
         return res

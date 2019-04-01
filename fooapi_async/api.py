@@ -6,7 +6,8 @@ from .utils import (
     not_found_on_exception,
     unathorized_on_authorization_error,
     ensure_contact_can_be_edited,
-    ensure_user_can_be_edited)
+    ensure_user_can_be_edited,
+    ensure_user_contacts_can_be_edited)
 from .validation_schemata import User, LimitOffset, Contact, Headers
 from .database_operations import (
     get_user_list,
@@ -33,7 +34,7 @@ class UsersHandler(RequestHandler):
         users, user_count = await get_user_list(**args.dict())
         self.write({
             'total': user_count,
-            'results': [u.as_dict(dump_contacts=True) for u in users]
+            'result': [u.as_dict() for u in users]
         })
 
     @bad_request_on_validation_error
@@ -63,13 +64,13 @@ class ContactsHandler(RequestHandler):
 
         self.write({
             'total': contact_count,
-            'results': [c.as_dict() for c in contacts]
+            'result': [c.as_dict() for c in contacts]
         })
 
     @unathorized_on_authorization_error
     @bad_request_on_validation_error
     @not_found_on_exception(UserNotFound)
-    @ensure_contact_can_be_edited
+    @ensure_user_contacts_can_be_edited
     async def post(self, user_id) -> None:
         args = Contact.parse_obj(
             prepare_request_arguments(self.request.body_arguments))
@@ -81,9 +82,10 @@ class ContactsHandler(RequestHandler):
             'result': {'contact_id': new_id}
         })
 
+    @unathorized_on_authorization_error
     @bad_request_on_validation_error
     @not_found_on_exception(UserNotFound)
-    @ensure_contact_can_be_edited
+    @ensure_user_contacts_can_be_edited
     async def delete(self, user_id) -> None:
         await delete_all_user_contacts(int(user_id))
         self.set_status(204)
@@ -97,6 +99,7 @@ class SingleUserHandler(RequestHandler):
             'result': user.as_dict()
         })
 
+    @unathorized_on_authorization_error
     @bad_request_on_validation_error
     @not_found_on_exception(UserNotFound)
     @ensure_user_can_be_edited
@@ -106,6 +109,7 @@ class SingleUserHandler(RequestHandler):
         await update_user(int(user_id), **args.dict())
         self.set_status(204)
 
+    @unathorized_on_authorization_error
     @bad_request_on_validation_error
     @not_found_on_exception(UserNotFound)
     @ensure_user_can_be_edited
@@ -122,6 +126,7 @@ class SingleContactHandler(RequestHandler):
             'result': contact.as_dict()
         })
 
+    @unathorized_on_authorization_error
     @bad_request_on_validation_error
     @not_found_on_exception(ContactNotFound)
     @ensure_contact_can_be_edited
@@ -131,6 +136,7 @@ class SingleContactHandler(RequestHandler):
         await update_contact(int(contact_id), **args.dict())
         self.set_status(204)
 
+    @unathorized_on_authorization_error
     @bad_request_on_validation_error
     @not_found_on_exception(ContactNotFound)
     @ensure_contact_can_be_edited

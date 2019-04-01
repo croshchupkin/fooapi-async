@@ -25,8 +25,9 @@ async def close_db_connections() -> None:
     await Tortoise.close_connections()
 
 
-async def create_schema(settings: Settings) -> None:
+async def create_schema() -> None:
     try:
+        global settings
         await init_db(settings)
         await Tortoise.generate_schemas(safe=False)
     finally:
@@ -34,6 +35,8 @@ async def create_schema(settings: Settings) -> None:
 
 
 async def drop_schema():
+    global settings
+    await init_db(settings)
     await Tortoise._drop_databases()
 
 

@@ -1,5 +1,6 @@
 import re
 from os.path import expanduser
+from typing import Optional
 
 import phonenumbers
 from pydantic import (BaseModel, validator, PositiveInt, EmailStr,
@@ -8,6 +9,15 @@ from jwt import decode as jwt_decode, InvalidTokenError
 
 from .models import (ContactTypeNameEnum, Contact as ContactModel,
                      User as UserModel)
+
+
+class EmailOrEmptyStr(EmailStr):
+    @classmethod
+    def validate(cls, value: str):
+        if isinstance(value, str) and not len(value):
+            return value
+
+        return super().validate(value)
 
 
 class PhoneNumberStr(str):
@@ -36,10 +46,10 @@ class PhoneNumberStr(str):
 
 
 class LimitOffset(BaseModel):
-    limit: PositiveInt = None
+    limit: Optional[PositiveInt] = None
     offset: PositiveInt = None
 
-    @validator('limit')
+    @validator('limit', always=True)
     def validate_limit(cls, v, **kwargs):
         # avoid cyclical import
         from .app import settings
@@ -55,10 +65,10 @@ class LimitOffset(BaseModel):
 
 class Contact(BaseModel):
     phone_no: PhoneNumberStr = ''
-    email: EmailStr = ''
+    email: EmailOrEmptyStr = ''
     type: ContactTypeNameEnum = ...
 
-    @validator('phone_no', pre=True)
+    @validator('phone_no')
     def validate_phone(cls, v, **kwargs):
         if len(v) > ContactModel.PHONE_MAX_LEN:
             raise ValueError(
@@ -66,14 +76,17 @@ class Contact(BaseModel):
 
         return v
 
-    @validator('email', pre=True, always=True)
+    @validator('email', always=True)
     def validate_email(cls, v, values, **kwargs):
         if len(v) > ContactModel.EMAIL_MAX_LEN:
             raise ValueError(
                 f'Maximum email length is {ContactModel.EMAIL_MAX_LEN}')
 
-        if not len(v) and not len(values['phone_no']):
-            raise ValueError('Either phone number or email must not be empty')
+        if not len(v) and not len(values.get('phone_no', '')):
+            raise ValueError('Either phone number or email must be provided')
+
+        if len(v) and len(values.get('phone_no', '')):
+            raise ValueError('Only one of phone or email can be provided')
 
         return v
 
@@ -114,6 +127,7 @@ class Settings(BaseSettings):
     db_uri: str = ...
     api_port: PositiveInt = ...
     pub_key: str = ...
+    priv_key: str = None
     paging_max_limit: PositiveInt = ...
 
     @validator('pub_key')
