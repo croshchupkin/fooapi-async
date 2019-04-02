@@ -1,4 +1,4 @@
-from fooapi_async.tests.functional import BaseTest
+from tests.functional import BaseTest
 
 
 class UsersHandlerTest(BaseTest):

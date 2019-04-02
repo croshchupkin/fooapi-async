@@ -14,7 +14,7 @@ from fooapi_async.app import (
     init_settings)
 from fooapi_async.routes import routes
 from fooapi_async.models import User, Contact
-from fooapi_async.tests.functional.db_fixtures import fixtures
+from tests.functional.db_fixtures import fixtures
 
 
 class BaseTest(AsyncHTTPTestCase):
