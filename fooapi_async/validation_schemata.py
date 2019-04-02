@@ -1,19 +1,28 @@
 import re
+from typing import Dict, Any
 from os.path import expanduser
 from typing import Optional
 
 import phonenumbers
-from pydantic import (BaseModel, validator, PositiveInt, EmailStr,
-                      BaseSettings, constr)
+from pydantic import (
+    BaseModel,
+    validator,
+    PositiveInt,
+    EmailStr,
+    BaseSettings,
+    constr)
 from jwt import decode as jwt_decode, InvalidTokenError
 
-from .models import (ContactTypeNameEnum, Contact as ContactModel,
-                     User as UserModel)
+from .models import (
+    ContactTypeNameEnum,
+    Contact as ContactModel,
+    User as UserModel,
+    ContactTypeEnum)
 
 
 class EmailOrEmptyStr(EmailStr):
     @classmethod
-    def validate(cls, value: str):
+    def validate(cls, value: str) -> str:
         if isinstance(value, str) and not len(value):
             return value
 
@@ -26,7 +35,7 @@ class PhoneNumberStr(str):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v):
+    def validate(cls, v: str) -> str:
         if not isinstance(v, str):
             raise TypeError('Phone number must be a string')
 
@@ -50,7 +59,7 @@ class LimitOffset(BaseModel):
     offset: PositiveInt = None
 
     @validator('limit', always=True)
-    def validate_limit(cls, v, **kwargs):
+    def validate_limit(cls, v: int, **kwargs) -> int:
         # avoid cyclical import
         from .app import settings
 
@@ -69,7 +78,7 @@ class Contact(BaseModel):
     type: ContactTypeNameEnum = ...
 
     @validator('phone_no')
-    def validate_phone(cls, v, **kwargs):
+    def validate_phone(cls, v: str, **kwargs) -> str:
         if len(v) > ContactModel.PHONE_MAX_LEN:
             raise ValueError(
                 f'Maximum phone length is {ContactModel.PHONE_MAX_LEN}')
@@ -77,7 +86,7 @@ class Contact(BaseModel):
         return v
 
     @validator('email', always=True)
-    def validate_email(cls, v, values, **kwargs):
+    def validate_email(cls, v: str, values: Dict[str, Any], **kwargs) -> str:
         if len(v) > ContactModel.EMAIL_MAX_LEN:
             raise ValueError(
                 f'Maximum email length is {ContactModel.EMAIL_MAX_LEN}')
@@ -91,7 +100,7 @@ class Contact(BaseModel):
         return v
 
     @validator('type')
-    def validate_type(cls, v, **kwargs):
+    def validate_type(cls, v: str, **kwargs) -> ContactTypeEnum:
         # replace user-friendly name with int value for database storage
         return int(ContactModel.NAMES_TO_TYPES[v])
 
@@ -108,7 +117,7 @@ class Headers(BaseModel):
     Authorization: str = ...
 
     @validator('Authorization', always=True)
-    def validate_jwt_token(cls, v, values, **kwargs):
+    def validate_jwt_token(cls, v: str, values: Dict[str, Any], **kwargs) -> str:
         match = re.fullmatch(r'Bearer (?P<jwt>[A-Za-z0-9.\-_=]+)', v)
         try:
             # avoid cyclical import
@@ -131,7 +140,7 @@ class Settings(BaseSettings):
     paging_max_limit: PositiveInt = ...
 
     @validator('pub_key')
-    def read_public_key(cls, v):
+    def read_public_key(cls, v: str) -> str:
         try:
             with open(expanduser(v), 'r') as f:
                 return f.read()

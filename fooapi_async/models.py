@@ -46,7 +46,7 @@ class Contact(Model):
                     type=self.TYPES_TO_NAMES[self.type],
                     created_at=self.created_at.isoformat())
 
-    def as_dict(self):
+    def as_dict(self) -> Dict[str, Any]:
         return {
             'id': self.id,
             'phone_no': self.phone_no,
@@ -75,7 +75,7 @@ class User(Model):
                 creator_id=self.creator_id,
                 contacts=', '.join((repr(c) for c in self.contacts)))
 
-    def as_dict(self, dump_contacts=False) -> Dict[str, Any]:
+    def as_dict(self, dump_contacts: bool = False) -> Dict[str, Any]:
         res = {
             'id': self.id,
             'name': self.name,

@@ -2,7 +2,7 @@ from tests.functional import BaseTest
 
 
 class UsersHandlerTest(BaseTest):
-    def test_users_returned(self):
+    def test_users_returned(self) -> None:
         self.do_get_and_assert(
             '/api/users',
             200,
@@ -39,7 +39,7 @@ class UsersHandlerTest(BaseTest):
                 'total': 3
             })
 
-    def test_users_limited_and_offset(self):
+    def test_users_limited_and_offset(self) -> None:
         self.do_get_and_assert(
             '/api/users?limit=1&offset=2',
             200,
@@ -55,7 +55,7 @@ class UsersHandlerTest(BaseTest):
                 'total': 3
             })
 
-    def test_limit_offset_validated(self):
+    def test_limit_offset_validated(self) -> None:
         self.do_get_and_assert(
             '/api/users?limit=-1&offset=-2',
             400,
@@ -81,7 +81,7 @@ class UsersHandlerTest(BaseTest):
                 ]
             })
 
-    def test_user_created(self):
+    def test_user_created(self) -> None:
         self.do_post_and_assert(
             '/api/users',
             201,
@@ -89,7 +89,7 @@ class UsersHandlerTest(BaseTest):
             {'name': 'Baz'},
             1)
 
-    def test_user_name_required(self):
+    def test_user_name_required(self) -> None:
         self.do_post_and_assert(
             '/api/users',
             400,
@@ -105,7 +105,7 @@ class UsersHandlerTest(BaseTest):
             {},
             1)
 
-    def test_jwt_required(self):
+    def test_jwt_required(self) -> None:
         self.do_post_and_assert(
             '/api/users',
             400,
@@ -122,7 +122,7 @@ class UsersHandlerTest(BaseTest):
 
 
 class ContactsHandlerTest(BaseTest):
-    def test_contacts_returned(self):
+    def test_contacts_returned(self) -> None:
         self.do_get_and_assert(
             '/api/users/1/contacts',
             200,
@@ -146,13 +146,13 @@ class ContactsHandlerTest(BaseTest):
                 'total': 2
             })
 
-    def test_404_on_nonexistent_user_id(self):
+    def test_404_on_nonexistent_user_id(self) -> None:
         self.do_get_and_assert(
             '/api/users/1000/contacts',
             404,
             {'result': 'User with id 1000 was not found'})
 
-    def test_contacts_limited_and_offset(self):
+    def test_contacts_limited_and_offset(self) -> None:
         self.do_get_and_assert(
             '/api/users/1/contacts?limit=1&offset=1',
             200,
@@ -169,7 +169,7 @@ class ContactsHandlerTest(BaseTest):
                 'total': 2
             })
 
-    def test_contact_is_added(self):
+    def test_contact_is_added(self) -> None:
         self.do_post_and_assert(
             '/api/users/1/contacts',
             201,
@@ -184,7 +184,7 @@ class ContactsHandlerTest(BaseTest):
             {'phone_no': '+380111111111', 'type': 'work'},
             200)
 
-    def test_contact_data_is_validated(self):
+    def test_contact_data_is_validated(self) -> None:
         self.do_post_and_assert(
             '/api/users/1/contacts',
             400,
@@ -240,7 +240,7 @@ class ContactsHandlerTest(BaseTest):
              'type': 'work'},
             100)
 
-    def test_401_on_invalid_creator_id(self):
+    def test_401_on_invalid_creator_id(self) -> None:
         self.do_post_and_assert(
             '/api/users/1/contacts',
             401,
@@ -253,7 +253,7 @@ class ContactsHandlerTest(BaseTest):
             401,
             1000)
 
-    def test_contacts_are_deleted(self):
+    def test_contacts_are_deleted(self) -> None:
         self.do_delete_and_assert(
             '/api/users/1/contacts',
             204,
@@ -266,7 +266,7 @@ class ContactsHandlerTest(BaseTest):
 
 
 class SingleUserHandlerTest(BaseTest):
-    def test_user_returned(self):
+    def test_user_returned(self) -> None:
         self.do_get_and_assert(
             '/api/users/1',
             200,
@@ -294,7 +294,7 @@ class SingleUserHandlerTest(BaseTest):
                 }
             })
 
-    def test_404_on_nonexistent_user_id(self):
+    def test_404_on_nonexistent_user_id(self) -> None:
         self.do_get_and_assert(
             '/api/users/1000',
             404,
@@ -312,7 +312,7 @@ class SingleUserHandlerTest(BaseTest):
             404,
             100)
 
-    def test_401_on_invalid_creator_id(self):
+    def test_401_on_invalid_creator_id(self) -> None:
         self.do_put_and_assert(
             '/api/users/1',
             401,
@@ -325,7 +325,7 @@ class SingleUserHandlerTest(BaseTest):
             401,
             1000)
 
-    def test_user_updated(self):
+    def test_user_updated(self) -> None:
         self.do_put_and_assert(
             '/api/users/1',
             204,
@@ -333,7 +333,7 @@ class SingleUserHandlerTest(BaseTest):
             {'name': 'Zack'},
             100)
 
-    def test_user_data_validated(self):
+    def test_user_data_validated(self) -> None:
         self.do_put_and_assert(
             '/api/users/1',
             400,
@@ -349,7 +349,7 @@ class SingleUserHandlerTest(BaseTest):
             {},
             100)
 
-    def test_user_deleted(self):
+    def test_user_deleted(self) -> None:
         self.do_delete_and_assert(
             '/api/users/1',
             204,
@@ -377,7 +377,7 @@ class SingleUserHandlerTest(BaseTest):
             })
 
 class SingleContactHandlerTest(BaseTest):
-    def test_contact_returned(self):
+    def test_contact_returned(self) -> None:
         self.do_get_and_assert(
             '/api/contacts/1',
             200,
@@ -391,7 +391,7 @@ class SingleContactHandlerTest(BaseTest):
                 }
             })
 
-    def test_404_on_nonexistent_user_id(self):
+    def test_404_on_nonexistent_user_id(self) -> None:
         self.do_get_and_assert(
             '/api/contacts/1000',
             404,
@@ -409,7 +409,7 @@ class SingleContactHandlerTest(BaseTest):
             404,
             100)
 
-    def test_401_on_invalid_creator_id(self):
+    def test_401_on_invalid_creator_id(self) -> None:
         self.do_put_and_assert(
             '/api/contacts/1',
             401,
@@ -422,7 +422,7 @@ class SingleContactHandlerTest(BaseTest):
             401,
             1000)
 
-    def test_contact_updated(self):
+    def test_contact_updated(self) -> None:
         self.do_put_and_assert(
             '/api/contacts/1',
             204,
@@ -430,7 +430,7 @@ class SingleContactHandlerTest(BaseTest):
             {'phone_no': '+380111111111', 'type': 'work'},
             100)
 
-    def test_contact_data_validated(self):
+    def test_contact_data_validated(self) -> None:
         self.do_put_and_assert(
             '/api/contacts/1',
             400,
@@ -451,7 +451,7 @@ class SingleContactHandlerTest(BaseTest):
             {},
             100)
 
-    def test_contact_deleted(self):
+    def test_contact_deleted(self) -> None:
         self.do_delete_and_assert(
             '/api/contacts/1',
             204,

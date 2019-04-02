@@ -1,5 +1,7 @@
+from typing import List, Tuple
+
 from tortoise import Tortoise
-from tornado.web import Application
+from tornado.web import Application, RequestHandler
 from tornado.ioloop import IOLoop
 
 from .validation_schemata import Settings
@@ -34,13 +36,13 @@ async def create_schema() -> None:
         await close_db_connections()
 
 
-async def drop_schema():
+async def drop_schema() -> None:
     global settings
     await init_db(settings)
     await Tortoise._drop_databases()
 
 
-def make_app(routes):
+def make_app(routes: List[Tuple[str, RequestHandler]]) -> Application:
     return Application(routes)
 
 

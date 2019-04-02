@@ -55,7 +55,7 @@ class UsersHandler(RequestHandler):
 class ContactsHandler(RequestHandler):
     @bad_request_on_validation_error
     @not_found_on_exception(UserNotFound)
-    async def get(self, user_id) -> None:
+    async def get(self, user_id: str) -> None:
         args = LimitOffset.parse_obj(
             prepare_request_arguments(self.request.query_arguments))
 
@@ -71,7 +71,7 @@ class ContactsHandler(RequestHandler):
     @bad_request_on_validation_error
     @not_found_on_exception(UserNotFound)
     @ensure_user_contacts_can_be_edited
-    async def post(self, user_id) -> None:
+    async def post(self, user_id: str) -> None:
         args = Contact.parse_obj(
             prepare_request_arguments(self.request.body_arguments))
 
@@ -86,14 +86,14 @@ class ContactsHandler(RequestHandler):
     @bad_request_on_validation_error
     @not_found_on_exception(UserNotFound)
     @ensure_user_contacts_can_be_edited
-    async def delete(self, user_id) -> None:
+    async def delete(self, user_id: str) -> None:
         await delete_all_user_contacts(int(user_id))
         self.set_status(204)
 
 
 class SingleUserHandler(RequestHandler):
     @not_found_on_exception(UserNotFound)
-    async def get(self, user_id):
+    async def get(self, user_id: str) -> None:
         user = await get_single_user(int(user_id))
         self.write({
             'result': user.as_dict()
@@ -103,7 +103,7 @@ class SingleUserHandler(RequestHandler):
     @bad_request_on_validation_error
     @not_found_on_exception(UserNotFound)
     @ensure_user_can_be_edited
-    async def put(self, user_id):
+    async def put(self, user_id: str) -> None:
         args = User.parse_obj(
             prepare_request_arguments(self.request.body_arguments))
         await update_user(int(user_id), **args.dict())
@@ -113,14 +113,14 @@ class SingleUserHandler(RequestHandler):
     @bad_request_on_validation_error
     @not_found_on_exception(UserNotFound)
     @ensure_user_can_be_edited
-    async def delete(self, user_id):
+    async def delete(self, user_id: str) -> None:
         await delete_single_user(int(user_id))
         self.set_status(204)
 
 
 class SingleContactHandler(RequestHandler):
     @not_found_on_exception(ContactNotFound)
-    async def get(self, contact_id):
+    async def get(self, contact_id: str) -> None:
         contact = await get_single_contact(int(contact_id))
         self.write({
             'result': contact.as_dict()
@@ -130,7 +130,7 @@ class SingleContactHandler(RequestHandler):
     @bad_request_on_validation_error
     @not_found_on_exception(ContactNotFound)
     @ensure_contact_can_be_edited
-    async def put(self, contact_id):
+    async def put(self, contact_id: str) -> None:
         args = Contact.parse_obj(
             prepare_request_arguments(self.request.body_arguments))
         await update_contact(int(contact_id), **args.dict())
@@ -140,6 +140,6 @@ class SingleContactHandler(RequestHandler):
     @bad_request_on_validation_error
     @not_found_on_exception(ContactNotFound)
     @ensure_contact_can_be_edited
-    async def delete(self, contact_id):
+    async def delete(self, contact_id: str) -> None:
         await delete_single_contact(int(contact_id))
         self.set_status(204)
